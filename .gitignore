@@ -1,0 +1,51 @@
+# build output
+/build/
+/build-*/
+/dist/
+/out/
+CMakeCache.txt
+CMakeFiles/
+*.o
+*.obj
+*.a
+*.lib
+*.pdb
+*.ilk
+*.exp
+
+# downloaded by BUILD.bat / BUILD_LZHAM.bat
+/w64devkit/
+/w64devkit*.zip
+/lzham_src/
+/lzham_build/
+/lzham*.zip
+/zstd*.zip
+/zstd/
+
+# binaries - except the bundled vgmstream
+*.exe
+*.dll
+!tools/vgmstream/*.exe
+!tools/vgmstream/*.dll
+/nfsnl_cli
+/monkeytool_cli
+
+# editors and OS
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# game files and exports - never commit these
+*.pack
+*.obb
+*.sb3d
+*.sba
+*.m3g
+*.wem
+*.bnk
+*.fbx

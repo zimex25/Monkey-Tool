@@ -1,0 +1,80 @@
+#include <windows.h>
+#include "resource.h"
+
+// The lowest-numbered icon resource becomes the exe's shell icon.
+IDI_APPICON ICON "monkeytool.ico"
+
+// 10 = RT_RCDATA. The picker decodes this with decodePng, so no image
+// library and no GDI+ is needed.
+IDR_LOGO_NFSNL  10 "logo_nfsnl.png"
+IDR_LOGO_RR1    10 "logo_rr1.png"
+IDR_LOGO_RR2    10 "logo_rr2.png"
+IDR_LOGO_RR3    10 "logo_rr3.png"
+IDR_LOGO_RRNEXT 10 "logo_rrnext.png"
+IDR_LOGO_NFSHP  10 "logo_nfshp.png"
+IDR_LOGO_NFSMW  10 "logo_nfsmw.png"
+IDR_LOGO_NFSEDGE 10 "logo_nfsedge.png"
+IDR_LOGO_RRGTI  10 "logo_rrgti.png"
+IDR_LOGO_NFSNLVR 10 "logo_nfsnlvr.png"
+IDR_ICON_NFSHP 10 "icon_nfshp.png"
+IDR_ICON_NFSMW 10 "icon_nfsmw.png"
+IDR_ICON_NFSNL 10 "icon_nfsnl.png"
+IDR_ICON_NFSNLVR 10 "icon_nfsnlvr.png"
+IDR_ICON_NFSEDGE 10 "icon_nfsedge.png"
+IDR_ICON_RR1 10 "icon_rr1.png"
+IDR_ICON_RRGTI 10 "icon_rrgti.png"
+IDR_ICON_RR2 10 "icon_rr2.png"
+IDR_ICON_RR3 10 "icon_rr3.png"
+IDR_ICON_RRNEXT 10 "icon_rrnext.png"
+IDR_SPLASH_NFSHP 10 "splash_nfshp.jpg"
+IDR_SPLASH_NFSMW 10 "splash_nfsmw.jpg"
+IDR_SPLASH_NFSNL 10 "splash_nfsnl.jpg"
+IDR_SPLASH_NFSNLVR 10 "splash_nfsnlvr.jpg"
+IDR_SPLASH_NFSEDGE 10 "splash_nfsedge.jpg"
+IDR_SPLASH_RR1 10 "splash_rr1.jpg"
+IDR_SPLASH_RRGTI 10 "splash_rrgti.jpg"
+IDR_SPLASH_RR2 10 "splash_rr2.jpg"
+IDR_SPLASH_RR3 10 "splash_rr3.jpg"
+IDR_SPLASH_RRNEXT 10 "splash_rrnext.jpg"
+IDR_LOGO_NFSUC  10 "logo_nfsuc.png"
+IDR_LOGO_NFSSHIFT 10 "logo_nfsshift.png"
+IDR_LOGO_NFSSHIFT2 10 "logo_nfsshift2.png"
+IDR_ICON_NFSUC 10 "icon_nfsuc.png"
+IDR_ICON_NFSSHIFT 10 "icon_nfsshift.png"
+IDR_ICON_NFSSHIFT2 10 "icon_nfsshift2.png"
+IDR_SPLASH_NFSUC 10 "splash_nfsuc.jpg"
+IDR_SPLASH_NFSSHIFT 10 "splash_nfsshift.jpg"
+IDR_SPLASH_NFSSHIFT2 10 "splash_nfsshift2.jpg"
+IDR_APPICON_BIG 10 "app_icon_128.png"
+IDR_TREEICONS 10 "tree_icons.png"
+IDR_TOOLBARICONS 10 "toolbar_icons.png"
+
+
+1 VERSIONINFO
+FILEVERSION     1,2,2,0
+PRODUCTVERSION  1,2,2,0
+FILEOS          VOS__WINDOWS32
+FILETYPE        VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",     "GM25"
+            VALUE "FileDescription", "Monkey Tool - game asset extractor"
+            VALUE "FileVersion",     "1.2.2"
+            VALUE "ProductName",     "Monkey Tool"
+            VALUE "ProductVersion",  "1.2.2"
+            VALUE "OriginalFilename","MonkeyTool.exe"
+            VALUE "LegalCopyright",  "by GM25, September 2026"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+// 1 = CREATEPROCESS_MANIFEST_RESOURCE_ID, 24 = RT_MANIFEST.
+// Spelled numerically so this does not depend on the macros being defined.
+1 24 "monkeytool.manifest"

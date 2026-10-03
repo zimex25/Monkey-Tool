@@ -1,0 +1,101 @@
+name: Build Monkey Tool (Windows exe)
+
+# Push this repository to GitHub and the workflow produces a ready-made
+# MonkeyTool.exe as a downloadable artifact - no compiler needed
+# on your own machine. Actions tab -> latest run -> Artifacts.
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]          # a tag like v1.1.5 also publishes a GitHub Release
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write           # needed to publish the release on a tag
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -A x64
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Fetch libzstd.dll
+        shell: pwsh
+        run: |
+          # zstd is needed for 3D models and for some texture cabinets
+          $url = "https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-v1.5.6-win64.zip"
+          Invoke-WebRequest -Uri $url -OutFile zstd.zip
+          Expand-Archive zstd.zip -DestinationPath zstd
+          $dll = Get-ChildItem -Recurse -Filter "libzstd.dll" zstd | Select-Object -First 1
+          if (-not $dll) { $dll = Get-ChildItem -Recurse -Filter "zstd.dll" zstd | Select-Object -First 1 }
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          if ($dll) { Copy-Item $dll.FullName dist/libzstd.dll }
+
+      - name: Collect
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item build/Release/MonkeyTool.exe dist/ -ErrorAction SilentlyContinue
+          Copy-Item build/Release/monkeytool_cli.exe dist/ -ErrorAction SilentlyContinue
+          foreach ($f in "README.md","CHANGELOG.md","LICENSE","THIRD_PARTY_NOTICES.md") { Copy-Item $f dist/ }
+          Copy-Item src/monkeytool.ico dist/ -ErrorAction SilentlyContinue
+          # vgmstream, for the sounds, with its licence
+          Copy-Item -Recurse tools/vgmstream dist/vgmstream
+          # the licences of the downloaded DLL and the compiled-in decoders
+          New-Item -ItemType Directory -Force -Path dist/licenses | Out-Null
+          $z = Get-ChildItem -Recurse -Filter "LICENSE*" zstd -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($z) { Copy-Item $z.FullName dist/licenses/zstd-LICENSE.txt }
+          Copy-Item src/lzham/LICENSE dist/licenses/lzham-LICENSE.txt
+          Copy-Item src/brotli/LICENSE dist/licenses/brotli-LICENSE.txt
+          Get-ChildItem -Recurse dist
+
+      - name: Version
+        id: ver
+        shell: pwsh
+        run: |
+          $v = (Select-String -Path CMakeLists.txt -Pattern 'VERSION ([0-9.]+)').Matches[0].Groups[1].Value
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MonkeyTool-${{ steps.ver.outputs.version }}-windows-x64
+          path: dist/
+
+      - name: Zip for the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/* -DestinationPath MonkeyTool-${{ steps.ver.outputs.version }}-windows-x64.zip
+          # the release notes: this version's section of the changelog
+          $lines = Get-Content CHANGELOG.md
+          $start = ($lines | Select-String -Pattern '^## ' | Select-Object -First 1).LineNumber
+          $next = ($lines | Select-String -Pattern '^## ' | Select-Object -Skip 1 -First 1).LineNumber
+          $lines[$start..($next - 2)] | Set-Content notes.md
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: MonkeyTool-${{ steps.ver.outputs.version }}-windows-x64.zip
+          body_path: notes.md
+          generate_release_notes: false
+
+  # Proves the portable core still builds and runs outside Windows, and
+  # syntax-checks the Windows sources against stub headers so missing
+  # declarations are caught even without a Windows machine.
+  linux-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y libzstd1
+      - run: cmake -B build && cmake --build build
+      - run: ./build/monkeytool_cli || true
+      - name: Syntax-check the Windows sources
+        run: ./tests/check_windows_syntax.sh
